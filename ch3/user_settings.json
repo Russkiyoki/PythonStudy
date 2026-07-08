@@ -1,0 +1,12 @@
+{
+    "username": "py_dev",
+    "theme": "dark",
+    "notifications": {
+        "email": true,
+        "sms": false
+    },
+    "projects": [
+        "Project A",
+        "Project B"
+    ]
+}

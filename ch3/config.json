@@ -1,0 +1,8 @@
+{
+   "database_url": "db.example.com",
+    "api_key": "abcdef12345",
+    "feature_flags": {
+    "new_dashboard": true,
+    "beta_access": false
+  }
+}
