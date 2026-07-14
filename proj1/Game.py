@@ -3,6 +3,8 @@ import re
 import random
 
 # A text based game
+# CURRENT ISSUE: 
+# need to cast input for stats in main method to int
 
 # Base class in which the other hero-type-classes will inherit from
 class Hero:
@@ -55,15 +57,16 @@ class Enemy(Hero): # I wonder if this will inherit everything from hero and add 
 # this is going to be my first boss
 class Roman(Enemy):
 	# Name: Discharged Praetorium
-	self.health = 37
-	self.mana = 12
-	self.strength = 10
-	self.agility = 1
+	def __init__(self):
+		self.health = 37
+		self.mana = 12
+		self.strength = 10
+		self.agility = 1
 
 	# returns nothing, prints an introduction dialogue
 	def introDialogue(self):
 		print("*thud*...*thud*...*thud*...oh? someone stands infront of a retired general and wont move...")
-		print("...so another barbarian thinks they will be the one to topple Rome...\n"
+		print("...so another barbarian thinks they will be the one to topple Rome...\n")
 		print(" I've dealt with much worse than you, bring it on!\n")
 
 	# Description below
@@ -71,7 +74,7 @@ class Roman(Enemy):
 	and the discoordination debuff to be subtracted from the players agility"""
 	def special(self):
 		rand = random.uniform(1,2)
-		print("DP uses his special: Discharged Praetorium charges at you bashing and slicing you, reducing your coordination.\n"
+		print("DP uses his special: Discharged Praetorium charges at you bashing and slicing you, reducing your coordination.\n")
 		dmg = int(strength * 1.2 * rand)
 		dc = int(strength * 1.4 * rand) # dc = discoordination debuff
 		return dmg, dc
@@ -94,11 +97,72 @@ def main():
 	print("You died pre-emptively, and had to do a few more quests before departing...\n")
 	print("Choose what flesh you will inhabit\n")
 	print("Attributes\tstrength\tagility\tintelligence\n")
-	print("Warror\t15\tX\tX\n")
-	print("Bandit\tX\t15\tX\n")
-	print("Wizard\tX\tX\t15\n")
+	print("Warror\t15\t\tX\t\tX\n")
+	print("Bandit\tX\t\t15\t\tX\n")
+	print("Wizard\tX\t\tX\t\t15\n")
 
-	choice = input.toLowerCase()
-	print(choice)
 
-main()
+	while True:
+		choice = input("Choose your class: Warrior, Bandit, Wizard\n")
+		choice = choice.lower()
+		
+		if choice in ["warrior", "bandit", "wizard"]:
+			break
+		else:
+			print("Please enter a valid class")	
+		
+
+	# Player "customization"
+	# Warriro selection
+	if choice == "warrior":
+		print("You chose to inhibit the Warrior, he naturally has 15 strength.")
+		# if user decides to get 10000000 stats in a trait or something
+		while True:
+			firstStat = input("How many points of agility would you like out of 10: \n")
+			if firstStat < 0 or firstStat > 10:
+				print("Cannot be outside of the bounds you crafty one")
+			else:
+				break
+		# same thing but for the second stat
+		while True:
+			secondStat = input("How many stats of Intelligence would you like out of" + 10-firstStat+ "\n")
+			if secondStat < 0 or secondStat > 10-firstStat:
+				print("Cannot be outside of the bounds you crafty one")
+			else:
+				break
+
+	# bandit selction
+	elif choice == "bandit":
+		print("You chose to inhibit the Bandit, he naturally has 15 agility.")
+		# if user decides to get 10000000 stats in a trait or something
+		while True:
+			firstStat = input("How many points of strength would you like out of 10: \n")
+			if firstStat < 0 or firstStat > 10:
+				print("Cannot be outside of the bounds you crafty one")
+			else:
+				break
+		# same thing but for the second stat
+		while True:
+			secondStat = input("How many stats of Intelligence would you like out of" + 10-firstStat+ "\n")
+			if secondStat < 0 or secondStat > 10-firstStat:
+				print("Cannot be outside of the bounds you crafty one")
+			else:
+				break
+
+	# Wizard selection
+	elif choice == "wizard":
+		print("You chose to inhibit the Wizard, he naturally has 15 intelligence.")
+		# if user decides to get 10000000 stats in a trait or something
+		while True:
+			firstStat = input("How many points of strength would you like out of 10: \n")
+			if firstStat < 0 or firstStat > 10:
+				print("Cannot be outside of the bounds you crafty one")
+			else:
+				break
+		# same thing but for the second stat
+		while True:
+			secondStat = input("How many stats of agility would you like out of" + 10-firstStat+ "\n")
+			if secondStat < 0 or secondStat > 10-firstStat:
+				print("Cannot be outside of the bounds you crafty one")
+			else:
+				break
