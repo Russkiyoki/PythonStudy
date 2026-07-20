@@ -1,0 +1,39 @@
+ight so basically, study.com sucks at explaining stuff so im creating this note on using base sqlite stuff. Its probably wrong but as long as it works for now ill take it.
+
+entering sqlite:
+go into terminal > "sqlite3" > start typing commands
+alternatively, you SHOULD actually save it to a file like so:
+	"sqlite3 mydatabase.db" or if inside sqlite3, ".open mydatabase.db"
+
+example of creation:
+	// so for the cmd of sqlite, everytime you enter, it doesnt end the command and will only end it if you decide to put a semicolon
+	CREATE TABLE employees (
+		id INTEGER PRIMARY KEY,
+		name TEXT NOT NULL,
+		age INTEGER,
+		department TEXT
+	);
+
+explanation:
+	PRIMARY KEY means that it is the primary key, meaning it is the unique identifier and cannot be duped for other data. 
+	NOT NULL means it just cant be null. ezpz
+
+example of insertion:
+	INSERT INTO employees (id, name, age, department)
+
+	VALUES
+
+	(1,"Elisey", 19, "Programming"),
+	(2,"Aussie", 26, "IT");
+
+example of retrieval:
+	SELECT * FROM employees;
+	SELECT * FROM employees ORDER BY age DESC;
+	// this line ^ retrieves by order of age descending order to see who is oldest
+
+
+example of modification:
+	UPDATE employees SET department = 'doohickey' WHERE name = 'Aussie';
+
+example of deletion:
+	DELETE FROM employees WHERE id = 1;
