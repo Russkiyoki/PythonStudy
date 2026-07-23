@@ -1,0 +1,10 @@
+Im thinking we go for 3 character options, 1 boss fight, 3 items to choose from upon boss death, use the dictionary for the didialogue of the boss, 
+
+notes:
+STORE PLAYERS CHOICES IN A  LIST
+have entire game in a while(true) loop and then break at the end if they decide they dont want to replay
+have main function
+while(isBossAlive) # keep fighting
+export name, decisions, isBossDefeated, stats, class, etc via Json
+
+
