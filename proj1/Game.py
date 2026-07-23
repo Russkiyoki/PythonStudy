@@ -65,6 +65,7 @@ class Roman(Enemy):
 
 	# returns nothing, prints an introduction dialogue
 	def introDialogue(self):
+		# I AM GOING TO CHANGE THIS OUT FOR DICTIONARY STUFF
 		print("*thud*...*thud*...*thud*...oh? someone stands infront of a retired general and wont move...")
 		print("...so another barbarian thinks they will be the one to topple Rome...\n")
 		print(" I've dealt with much worse than you, bring it on!\n")
