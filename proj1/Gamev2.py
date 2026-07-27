@@ -159,6 +159,19 @@ class Hero:
 
 			return Hero(health=25, mana=35, strength = firstStat, agility = secondStat, intel = 15, name=name)
 
+class Enemy:
+	def __init__(self, Hero):
+		pass
+		# idk what would go here tbh yet
+	def dialogue():
+		dial = {
+			"taunt0" : "I've had germanic girls put up more of a fight!\n",
+			"taunt1" : "If I wanted to waste my time, I would debate Aristotle about the birds and the bees.\n",
+			"taunt2" : "You wouldn't even make for a good beggar...\n" ,
+			"win" : "And so my blade claims another soul, rest in piss...\n",
+			"death" : "agh-- all these years... i delivered souls over unto death without knowing her face, and now into her arms i go...\n"
+		
+
 def print_title():
 	print("\t\tAdventures in Abengarde\n")
 	print("Welcome oh departed soul, lost one in need of flesh...\n")
@@ -227,7 +240,6 @@ def main():
 				# data will be written here using json.dump()
 				# indent=4 makes the output be formatted nicely
 				json.dump(user_data, file, indent=4)
-			print("File opened for writing and automatically closed")
 		# print why did it fail?
 		except Exception as e:
 			print(f"An error occurred during file opening: {e}")
@@ -235,7 +247,7 @@ def main():
 
 		# exit or replay loop
 		while True:
-			replay = input("Would you like to reincarnate? (y/n): ")
+			replay = input("Congratulations, you have freed us! Would you like to reincarnate? (y/n): ")
 			decisions.append(replay) # save even if stupid response
 			replay = replay.lower()
 			if replay == "y":
