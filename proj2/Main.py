@@ -21,17 +21,16 @@ import re
 # use try-except blocks
 # ensure that db is saved persistently, like saved after multiple runs
 
-# function to create a new student
 
 # Function to check if Grade is valid, returns true or false 
-def gradeChecker(grade):
+def grade_checker(grade):
     if not re.match("^[A-F][-+]?$", grade.upper()):
-        print("Invalid grade, try again", grade)
+        print("Invalid grade, try again")
         return False
     return True
 
 # Function to check if email is valid, returns true or false
-def emailChecker(email):
+def email_checker(email):
     emailPattern = re.compile(r"^.+@.+\..+$") 
     # if email doesnt match, exit
     if not re.match(emailPattern, email):
@@ -40,7 +39,7 @@ def emailChecker(email):
     return True
 
 # Function to check if name is valid, returns true or false
-def nameChecker(name):
+def name_checker(name):
     # if name has something not letters
     if not re.match("^[A-Za-z]+$", name):
         print("Invalid name, try again")
@@ -50,17 +49,15 @@ def nameChecker(name):
 # function to create new student and insert into database
 def create(cur, name, grade, email):
     # if three pass, insert
-    if gradeChecker(grade) and emailChecker(email) and nameChecker(name):
+    if grade_checker(grade) and email_checker(email) and name_checker(name):
         try:
             cur.execute("INSERT INTO students (name, grade, email) VALUES (?,?,?)", (name,grade,email))
         except sqlite3.Error as e:
             print(f"Error adding: {e}")
-    else:
-        print("Sorry! Invalid data")
+    # Dont think ill need an else since my checkers print what fails
 
 # function to read all students or a specific student via id
 def read(cur, id=None):
-
     # user did not specify, so print all
     if id == None:
         try:
@@ -82,15 +79,18 @@ def read(cur, id=None):
 
  # function to update a students info
 def update(cur, id):
+    cur.execute("SELECT * FROM students WHERE id = ?", (id,))
+    row = cur.fetchone()
+    print(row)
     while True:
-        choice = input("What would you to modify? (name, grade, email)\n")
+        choice = input("What would you to modify? (name, grade, email, cancel)\n")
         choice = choice.lower()
-        if choice.lower() not in ["id", "name", "grade", "email"]:
+        if choice.lower() not in ["id", "name", "grade", "email", "cancel"]:
             print("Invalid selection, try again\n")
 
         elif choice == "name":
             newName = input("Please enter new name\n")
-            if nameChecker(newName):
+            if name_checker(newName):
                 try:
                     cur.execute("UPDATE students SET name = ? WHERE id = ?", (newName,id))
                     break
@@ -99,7 +99,7 @@ def update(cur, id):
 
         elif choice == "grade":
             newGrade = input("Please enter new grade\n")
-            if gradeChecker(newGrade):
+            if grade_checker(newGrade):
                 try:
                     cur.execute("UPDATE students SET grade = ? WHERE id = ?", (newGrade,id))
                     break
@@ -108,21 +108,42 @@ def update(cur, id):
 
         elif choice == "email":
             newEmail = input("Please enter new email\n")
-            if emailChecker(newEmail):
+            if email_checker(newEmail):
                 try:
                     cur.execute("UPDATE students SET email = ? WHERE id = ?", (newEmail,id))
                     break
                 except sqlite3.Error as e:
                     print(f"Error updating: {e}")
 
-        
-        
+        elif choice == "cancel":
+            print("Cancelling, returning to menu")
+            break
 
 # function to delete a student via id 
-def delete(id):
-    pass
+def delete(cur, id):
+    try:
+        cur.execute("SELECT * FROM students WHERE id = ?", (id,))
+        row = cur.fetchone()
+        print(row)
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
 
-
+    while True:
+        confirm = input("Are you sure you want to delete this record? (yes, no)\n")
+        if confirm.lower() == "yes":
+            try:
+                cur.execute("DELETE FROM students WHERE id = ?", (id,))
+                print("Deleted student!")
+                break
+            except sqlite3.Error as e:
+                print(f"Error deleting student: {e}")
+                break
+        elif confirm.lower() == "no":
+            print("Cancelling, returning to menu...")
+            break
+        else:
+            print("Invalid entry, try again\n")
+    
 
 def exit(con):
     print("Have a nice day!\n")
@@ -135,7 +156,6 @@ def main():
     try:
         connection = sqlite3.connect("school.db")
         cursor = connection.cursor()
-        cursor.execute("""DROP TABLE IF EXISTS students""")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS students(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,6 +169,7 @@ def main():
 
     # my constant loop until they "exit"()
     while True:
+        print()
         print("########### Student Records ###########")
         print("Valid options: create, read, update, delete, exit")
         choice = input("what would you like to do?\n")
@@ -173,10 +194,11 @@ def main():
         elif choice == "update":
             id = input("What student via ID would you like to update?\n")
             update(cursor, id)
-            pass
 
         elif choice == "delete":
-            pass
+            id = input("What student via ID would you like to delete?\n")
+            delete(cursor, id)
+            
 
         elif choice == "exit":
             exit(connection)
