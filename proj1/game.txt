@@ -1,0 +1,458 @@
+# Elisey Voichishin CS113 Study.com 
+# A simple text-based adventure game
+
+import re
+import json
+import random
+
+# global list for decisions
+decisions = []
+# my victory boolean
+victory = False
+isNew = True
+
+	
+# Base class in which the other hero-type-classes will inherit from
+class Hero:
+	# initialization
+	def __init__(self, health, mana, strength, intel, agility, skillPoints=0, exp =0, name="John"):
+		self.health = health
+		self.mana = mana
+		self.strength = strength
+		self.intel = intel # intelligence stat
+		self.agility = agility
+		self.skillPoints = skillPoints # default for 0 so i can use for enemies
+		self.name = name
+	
+	# default attack will be strike, each child class will have their power
+	# But I will also be adding other actions for the other classes to have their fun
+	def strike(self):
+		return (self.strength * 0.4) + (self.agility * 0.2) + (self.intel * 0.1) + random.randint(1, 100)
+	
+	# default dodge
+	def dodge(self):
+		return ( self.agility * 2) + (self.strength * 0.3) + self.intel + random.randint(1, 100)
+
+	def heal(self):
+		return (self.strength*0.2) + (self.agility * 0.4) + (self.intel*0.8) + random.randint(1, 100)
+
+	# method to create a player, to call the class itself and return player
+	# found out about it through geeks4geeks
+	@classmethod
+	def createPlayer(cls, choice):
+		if choice == "warrior":
+			print("You chose to inhabit the Warrior, he naturally has 15 strength.")
+
+			# if user decides to get 10000000 stats in a trait or something
+			while True:
+				firstStat = int(input("How many points of agility would you like out of 10: \n"))
+				decisions.append(firstStat) # save even if stupid response
+				if firstStat < 0 or firstStat > 10:
+					print("Cannot be outside of the bounds you crafty one")
+				else:
+					break
+
+			# same thing but for the second stat
+			while True:
+				secondStat = int(input("How many stats of Intelligence would you like out of " + str(10-firstStat) + ":\n"))
+				decisions.append(secondStat) # save even if stupid response
+				if secondStat < 0 or secondStat > 10-firstStat:
+					print("Cannot be outside of the bounds you crafty one")
+				else:
+					break
+			# name check
+			while True:
+				name = input("By what name will you go by this time?\n")
+				decisions.append(name) # save even if stupid response
+				if re.match("^[A-Za-z]*$", name):
+					break
+				else:
+					print("Please enter a valid name, only letters are allowed")
+
+			# actual return
+			return Hero(health=35, mana=25, strength = 15, agility = firstStat, intel = secondStat, name=name)
+
+		# bandit selction
+		elif choice == "bandit":
+			print("You chose to inhabit the Bandit, he naturally has 15 agility.")
+
+			# if user decides to get 10000000 stats in a trait or something
+			while True:
+				firstStat = int(input("How many points of strength would you like out of 10: \n"))
+				decisions.append(firstStat) # save even if stupid response
+				if firstStat < 0 or firstStat > 10:
+					print("Cannot be outside of the bounds you crafty one")
+				else:
+					break
+
+			# same thing but for the second stat
+			while True:
+				secondStat = int(input("How many stats of Intelligence would you like out of " + str(10-firstStat) + ":\n"))
+				decisions.append(secondStat) # save even if stupid response
+				if secondStat < 0 or secondStat > 10-firstStat:
+					print("Cannot be outside of the bounds you crafty one")
+				else:
+					break
+
+			# Name check
+			while True:
+				name = input("By what name will you go by this time?\n")
+				decisions.append(name) # save even if stupid response
+				if re.match("^[A-Za-z]*$", name):
+					break
+				else:
+					print("Please enter a valid name, only letters are allowed")
+
+				# actual return
+			return Hero(health=25, mana=25, strength = firstStat, agility = 15, intel = secondStat, name=name)
+
+		# Wizard selection
+		elif choice == "wizard":
+			print("You chose to inhabit the Wizard, he naturally has 15 intelligence.")
+
+			# if user decides to get 10000000 stats in a trait or something
+			while True:
+				firstStat = int(input("How many points of strength would you like out of 10: \n"))
+				decisions.append(firstStat) # save even if stupid response
+				if firstStat < 0 or firstStat > 10:
+					print("Cannot be outside of the bounds you crafty one")
+				else:
+					break
+			# same thing but for the second stat
+
+			while True:
+				secondStat = int(input("How many stats of agility would you like out of " + str(10-firstStat) + ":\n"))
+				decisions.append(secondStat) # save even if stupid response
+				if secondStat < 0 or secondStat > 10-firstStat:
+					print("Cannot be outside of the bounds you crafty one")
+				else:
+					break
+
+			# Name check
+			while True:
+				name = input("By what name will you go by this time?\n")
+				decisions.append(name) # save even if stupid response
+				if re.match("^[A-Za-z]*$", name):
+					break
+				else:
+					print("Please enter a valid name, only letters are allowed")
+
+			return Hero(health=25, mana=35, strength = firstStat, agility = secondStat, intel = 15, name=name)
+
+class Enemy(Hero):
+	def __init__(self, health, mana, strength, intel, agility, name="Enemy"):
+		super().__init__(health, mana, strength, intel, agility, name) 
+
+		self.dialogue = {
+			"taunt0" : "DP: I've had germanic girls put up more of a fight!",
+			"taunt1" : "DP: If I wanted to waste my time, I would debate Aristotle about the birds and the bees.",
+			"taunt2" : "DP: You wouldn't even make for a good beggar..." ,
+			"win" : "DP: And so my blade claims another soul, rest in piss...",
+			"death" : "DP: agh-- all these years... i delivered souls over unto death without knowing her face, and now into her arms i go..."
+		}
+
+
+# a function that prints intro, requires no parameters
+def print_title():
+	print()
+	print("\t\tAdventures in Abengarde\n")
+	print("Welcome oh departed soul, lost one in need of flesh...\n")
+	print("You died pre-emptively, and had to do a few more quests before departing...\n")
+	print("Choose what flesh you will inhabit\n")
+	print("Attributes\tstrength\tagility\tintelligence\n")
+	print("Warror\t15\t\tX\t\tX\n")
+	print("Bandit\tX\t\t15\t\tX\n")
+	print("Wizard\tX\t\tX\t\t15\n")
+
+
+# Intro lore, prints a bunch of lore returns nothing requires no parameters
+def lore():
+	print("*You awake, your head aches with a pain that reminds you of something you just cant remember.*")
+	print("*You feel a heavy weight on your chest, soaked in warm liquid, and you realize that you are laying in Jarod's blood*")
+	print()
+	print("Jarod: *cough*... hey...")
+	print("*fear takes over you as you wake up to reality*")
+	print("You: Jarod! get up! What happened I don't remember any of this...")
+	print("Jarod: *cough* ...it doesn't mat- *cough*... it doesn't matter. Whats done is done...")
+	print("You: What do you mean? What happened?")
+	print("Jarod:... hes coming...")
+	print("You: What are you even talking about?")
+	print("Jarod: take this...")
+
+# 2nd lore, prints a bunch of lore returns nothing requires no parameters
+def lore2():
+	# Jarod is now dead, this is prep for the fight
+	print("*thud* *thuD* *THUD*")
+	print("You: What is walking so heavy?")
+	print("...")
+	print("Unknown: *sighs*...  You know, its really hard trying to lead so many people in my old age...")
+	print("Unknown: but I have a reputation to uphold, my soldiers are loyal to me, *laughs* but not so much my bosses")
+	print("Unknown: my soldiers, they are unfed and relying on me for some chow")
+	print("Unknown: ...listen kid, loosen up. I don't want to make this harder than it needs to be.")
+	print("Unknown: many have believed themselves to be the one who takes me down, but they all have failed so far...")
+	print("Unknown: do you want to know why?")
+
+# create player function, that way my main() doesnt look wicked
+def main():
+	# my infinite loop for replayability
+	# I wanted to start with the json stuff instead of title because I think it would make more sense
+	# if they had wanted to load a previous save, and they got the title first that would be weird
+	
+	global isNew, victory
+	user_data = None #init as null
+	while True:
+		try:
+			with open('user_settings.json', 'r') as file: # open in reading mode
+				# output stats 
+				user_data = json.load(file)
+
+				print(f"Welcome back {user_data['username']}! Your stats are as follows: \n")
+				print(f"Health: {user_data['health']}")
+				print(f"Mana: {user_data['mana']}")
+				print(f"Strength: {user_data['strength']}")
+				print(f"Agility: {user_data['agility']}")
+				print(f"Intelligence: {user_data['intelligence']}")
+
+				choice = input("Would you like to start over? (y/n): ")
+				decisions.append(choice) # save even if stupid response
+				if choice.lower() == "n":
+					print("Continuing with your previous character...")
+					isNew = False
+				else:
+					print("Starting over...")
+					isNew = True
+					print_title()
+
+		except FileNotFoundError:
+			isNew = True
+
+		# input loop for valid entry
+		if isNew == True:
+			while True:
+				choice = input("Choose your class: Warrior, Bandit, Wizard\n")
+				decisions.append(choice) # save even if stupid response
+				choice = choice.lower()			
+
+				if choice in ["warrior", "bandit", "wizard"]:
+					player = Hero.createPlayer(choice)
+					break
+				else:
+					print("Please enter a valid class!")
+		else:
+			player = Hero(user_data['health'], user_data['mana'], user_data['strength'], user_data['intelligence'], user_data['agility'], name=user_data['username'])
+
+
+		# print intro lore 
+		print() # extra line of space for readability
+		lore() #Jarod gives us a gift of tome of knowledge before his death
+		choice = input("Tome of Knowledge: grants +2 to a trait. Do you accept it? (y/n): ")
+		decisions.append(choice) # save even if stupid response
+		# player accepts tome
+		if choice.lower() == "y":
+			while True:
+				trait = input("Which trait would you like to increase? (strength, agility, intelligence): ")
+				decisions.append(trait) # save even if stupid response
+				trait = trait.lower()
+				if trait == "strength":
+					player.strength += 2
+					print("**You feel power rising within you...**")
+					break
+				elif trait == "agility":
+					player.agility += 2
+					print("**You feel power rising within you...**")
+					break
+				elif trait == "intelligence":
+					player.intel += 2
+					print("**You feel power rising within you...**")
+					break
+				else:
+					print("Please enter a valid trait!")
+
+		# Player refuses tome of knowledge
+		elif( choice.lower() == "n"):
+			print("You: Jarod! Stop wasting time, we need to get you help!")
+			print("Jarod: ...praetorium...")
+			print("You: what?...")
+			print("Jarod:...")
+			# emotional distress penalty 
+			print("**You feel despair and fear, your stats have been reduced by 1**")
+			player.strength -= 1
+			player.agility -= 1
+			player.intel -= 1
+
+		lore2() # " Do you want to know why none have taken me down (y/n)"
+		choice = input()
+		decisions.append(choice) # save even if stupid response
+		while True: # while not in combat
+			if choice.lower() == "y":
+				print("You: ...sure? *grips harder*")
+				print("Unknown: It is simple. It is hard to take down a Praetorium, it is held up by 4 pillars.")
+				print("Unknown: it is also guarded heavily. I have carried my pillars through many victories, my casualities are low")
+				print("Unknown: and my mercy even lower. Either you give me what I need, or you too will face a similar fate...")
+			elif choice.lower() == "n":
+				print("You: No, i haven't the slightest care in the world for you. You brought anguish onto my soil...")
+				print("You: You spilled his blood for naught...")
+				print("You: You have avaricious motives, but mine are now even more sadistic...")
+				print("You: Either I avenge him right now, or i will laugh with him in Zangardia...")
+				print("Unknown: Oh death, kiss my sword once more and hold me dear, i have yet another gift for you!")
+				print("Unknown: The Discharged Praetorium wont ever fall!")
+				print("** Engaging combat **")
+				break
+
+			print("You: What do you need?")
+			print("Unknown: I knew you'd be smart, before I ask. Many call me The Discharged Praetorium, you can call me General")
+			print("DP: I need 60% of this town's food supply, and 50% of gold from commerce.")
+			print("DP: What do you think? Do you think you can meet my demands? (y/n)")
+			choice = input()
+			decisions.append(choice) # save even if stupid response
+			if choice.lower() == "y":
+				print("You: I will meet your demands, but you will have to wait until the next harvest...")
+				print("DP: Boy did you not hear me? My soldiers are starving. Give it now.")
+				print("You: Thats not something I expected from you. Who am i kidding! JAROD'S BLOOD IS ON MY HANDS!")
+				print("You: AND I NEGOTIATE WITH THIS BASTARD?")
+				print("** Engaging combat **")
+				break
+			elif choice.lower() == "n":
+				print("DP: I knew i had high hopes for you kid, I just wish you didn't have to look so much like my boy...")
+				print("** Engaging combat **")
+				break
+
+		# creating enemy object
+		general = Enemy(40, 0, 20, 5, 5, name = "Discharged Praetorium")
+
+		# FIGHTING TIME!!!!)!&*^%!&*^!(*&)
+		# dp's heal
+		print()
+		print()
+		usedHeal = False
+		while True:
+
+			# actual combat loop
+			# correct input loop
+			while player.health >0 and general.health>0:
+				print(f"{player.name}'s health: {player.health:.2f}")
+				print("**Your choices**")
+				choice = input("strike or heal\n")
+				decisions.append(choice) 
+				if choice.lower() in ["strike", "heal"]:
+					# strike choice
+					if choice.lower() == "strike":
+						toHit = random.randint(1,100)
+						playersRoll = player.strike()
+						if playersRoll > toHit:
+							dmg = player.strength * 0.75 + player.agility * 0.5 + player.intel * 0.25 + random.randint(1,8)
+							print(f"**you hit DP for {dmg}!")
+							general.health -= dmg
+						else:
+							print("**your attack misses!**")
+							taunts = list(general.dialogue.keys())[:3]  # ['taunt0', 'taunt1', 'taunt2']
+							random_taunt = random.choice(taunts)
+							print(general.dialogue[random_taunt])
+					# heal will be more "rewarding" because it would be more rarely used
+					# heal choice
+					elif choice.lower() == "heal":
+						toHit = random.randint(1,100)
+						if player.heal() > toHit:
+							heal = player.strength *0.1 + player.agility * 0.4 + player.intel * 0.8 + random.randint(1,8)
+							print(f"**you heal for {heal}!**")
+							player.health += heal
+						else:
+							print("Your heal failed!")
+
+
+					# if boss deafeated
+					if general.health <= 0:
+							#print(enemy.dialogue["taunt1"])
+						print(general.dialogue["death"])
+						print("*out of breath, you lay down you won... but at what cost?*")
+						victory = True
+						break
+
+					print() # for readability
+					print(f"DP's Health: {general.health:.2f}")
+
+					# GENERALS TURN
+					# if health is greater than 20, or if he already used his heal (cant use more than 1x cuz thatd be wicked)
+					if general.health > 20 or usedHeal:
+						toHit = player.dodge()
+						if general.strike() > toHit:
+							dmg = general.strength * 0.75 + general.agility * 0.5 + general.intel * 0.25 + random.randint(1,4)
+							print(f"**DP hit you for {dmg}")
+							player.health -= dmg
+						else:
+							print("**DP tried swinging you dodged!**")
+					else:
+						toHit = random.randint(1,100)
+						if general.heal() > toHit:
+							heal = general.strength *0.1 + general.agility * 0.4 + general.intel * 0.8 + random.randint(1,8)
+							print(f"**DP healed for {heal}**")
+							general.health += heal
+							usedHeal = True
+						else:
+							print("**DP tried to heal but failed!**")
+
+					#extra line for readability
+					print()
+					if player.health <= 0:
+						print("**you see glimpses of playing with Jarod from long ago**")
+						print(general.dialogue["win"])
+						break
+				else:
+					print("invalid choice, try again")
+			break
+		break
+					
+					
+	if player.health < 0:
+		# reset if dead, to not cause an infinite loop
+		player.health = 0
+
+	# output for json stuff
+	user_data = {
+		"username": player.name,
+		"health": player.health,
+		"mana": player.mana,
+		"strength": player.strength,
+		"agility": player.agility,
+		"intelligence": player.intel,
+		"victory": victory,
+		"decisions": decisions
+	}
+
+	# try to open file without breaking the program
+	try:
+		# opening the file in write mode
+		with open('user_settings.json', 'w') as file:
+			# data will be written here using json.dump()
+			# indent=4 makes the output be formatted nicely
+			json.dump(user_data, file, indent=4)
+	# print why did it fail?
+	except Exception as e:
+		print(f"An error occurred during file opening: {e}")
+
+
+	# exit or replay loop
+	while True:
+		replay = input("Congratulations, you have freed us! Would you like to reincarnate? (y/n): ")
+		decisions.append(replay) # save even if stupid response
+		replay = replay.lower()
+		if replay == "y":
+			break
+		elif replay == "n" and victory:
+			print("Farewell traveler, thank you for defeating the evil that lurks in Abengarde!")
+			break
+		elif replay == "n" and not victory:
+			print("Another young one taken before their time... goodbye good soul")
+			break
+		else:
+			print("Please enter a valid option!")
+			
+
+main()
+
+
+# sources
+# GeeksforGeeks. (2026, June 8). @classmethod in Python. https://www.geeksforgeeks.org/python/classmethod-in-python/
+# Study.com. (2025, April 29). JSON files in Python: Opening, updating and saving. https://study.com/academy/lesson/json-files-in-python-opening-updating-and-saving.html
+# Medium. (n.d.). Regular expressions using the re module to extract information from strings. https://medium.com/data-science/regular-expressions-using-the-re-module-to-extract-information-from-strings-3d0500e8db1c
+# W3Schools. (n.d.). Python lists add. https://www.w3schools.com/python/python_lists_add.asp
