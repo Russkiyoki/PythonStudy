@@ -1,0 +1,40 @@
+This assignment emphasizes data handling, model interpretation, and interactive program design using popular libraries like pandas, matplotlib, and scikit-learn.
+
+Your program should:
+
+1)Load Dataset from CSV File
+
+    Use a provided CSV file (e.g., containing columns Size (sqft) and Price ($)).
+    Use pandas to read and manage the dataset. 
+
+2)Explore and Visualize the Data
+
+    Display basic statistics (mean, min, max, etc.).
+    Plot the data using matplotlib to show the relationship between house size and price. 
+
+3)Train a Linear Regression Model
+
+    Use scikit-learn to fit a linear regression model to the data.
+    Clearly display the model's coefficient, intercept, and R? score. 
+
+4)Visualize Model Fit
+
+    Display a scatter plot of the data points along with the regression line. 
+
+5)Predict Price from User Input
+
+    Prompt the user to enter a house size (in square feet).
+    Predict and display the estimated house price based on the trained model.
+    Handle invalid inputs gracefully (e.g., non-numeric or negative values). 
+
+6)Modular Design
+
+    Organize the program using functions (e.g., load_data(), train_model(), predict_price(), etc.) to promote clarity and reusability. 
+
+Additional Notes
+
+    Include sample data in your submission (housing_data.csv) with at least 20 rows.
+    Be sure to use try-except blocks to handle potential errors (e.g., file not found, input errors).
+    Comment your code and include a short README or documentation block explaining how the program works. 
+
+You may refer to the course material for supporting evidence, but you must use 3-5 external sources. All sources should be cited using APA format
